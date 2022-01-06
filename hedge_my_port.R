@@ -82,11 +82,12 @@ hedgePortfolio = function(hedge,static_hedge,downNdays){
 # Test Idea First: Only want to hedge the downside hence BETA bear
 hedgeBETA = CAPM.beta.bear(Ra=rsk$PORT, Rb=rsk[,hedge], Rf = 0)
 # Rolling average of returns the last N-days
-toHedge$AVG = rollmean(toHedge$PORT, k=downNdays)
+#toHedge$AVG = rollmean(toHedge$PORT, k=downNdays)
+toHedge$AVG = PerformanceAnalytics::apply.rolling(R=toHedge$PORT, width = 2,trim = FALSE,by = 1,FUN = mean)
 # Only want to hedge when my portfolio is down over the last N-days
 toHedge$sig = Lag(ifelse(toHedge$AVG < 0, -1, 0))
 # add Benchmark
-toHedge = na.omit(merge(toHedge,rsk[,hedge]))
+toHedge = (merge(toHedge,rsk[,hedge]))
 # add hedged portfolio
 toHedge$hedgedPORT= ifelse(toHedge$sig == -1,                 # if signal == -1
                            (toHedge$sig*toHedge[,hedge]*hedgeBETA)+
